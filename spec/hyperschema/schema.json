@@ -1,0 +1,25 @@
+{
+  "version": 1,
+  "schema": [
+    {
+      "name": "forward-push-request",
+      "namespace": "blind-push-gateway",
+      "compact": false,
+      "flagsPosition": -1,
+      "fields": [
+        {
+          "name": "payload",
+          "required": true,
+          "type": "buffer",
+          "version": 1
+        },
+        {
+          "name": "discoveryKey",
+          "required": true,
+          "type": "fixed32",
+          "version": 1
+        }
+      ]
+    }
+  ]
+}
