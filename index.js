@@ -52,7 +52,7 @@ const DEFAULT_APNS_TOPIC = 'io.keet.app'
 
 class BlindPushGateway extends ReadyResource {
   /**
-   * @param {import('hyperswarm')} swarm
+   * @param {import('hyperdht')} dht
    * @param {import('protomux-rpc-router')} router
    * @param {ExternalPushService} externalPushService
    * @param {object} [opts]
@@ -60,17 +60,17 @@ class BlindPushGateway extends ReadyResource {
    * @param {string} [opts.apnsTopic='io.keet.app']
    */
   constructor(
-    swarm,
+    dht,
     router,
     externalPushService,
     { notification = DEFAULT_NOTIFICATION, apnsTopic = DEFAULT_APNS_TOPIC } = {}
   ) {
     super()
 
-    this.swarm = swarm
+    this.dht = dht
     this.router = router
     this.externalPushService = externalPushService
-    this.notification = { ...DEFAULT_NOTIFICATION, ...notification }
+    this.notification = notification
     this.apnsTopic = apnsTopic
     this.stats = { attempted: 0, sent: 0, failed: 0 }
 
@@ -82,20 +82,20 @@ class BlindPushGateway extends ReadyResource {
       },
       this._forwardPush.bind(this)
     )
+    this.server = this.dht.createServer()
   }
 
   get publicKey() {
-    return this.swarm.keyPair.publicKey
+    return this.dht.defaultKeyPair.publicKey
   }
 
   async _open() {
     await this.router.ready()
 
-    this.swarm.on('connection', (conn) => {
-      this.router.handleConnection(conn, this.swarm.keyPair.publicKey)
+    this.server.on('connection', (conn) => {
+      this.router.handleConnection(conn, this.dht.defaultKeyPair.publicKey)
     })
-
-    await this.swarm.listen()
+    await this.server.listen()
   }
 
   async _close() {

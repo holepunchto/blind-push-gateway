@@ -1,7 +1,6 @@
 const test = require('brittle')
 const createTestnet = require('hyperdht/testnet')
 const HyperDHT = require('hyperdht')
-const Hyperswarm = require('hyperswarm')
 const ProtomuxRPC = require('protomux-rpc')
 const ProtomuxRPCRouter = require('protomux-rpc-router')
 const b4a = require('b4a')
@@ -20,13 +19,15 @@ async function setupTestnet(t) {
 
 async function setupGateway(t, bootstrap) {
   const sentMessages = []
-  const swarm = new Hyperswarm({ bootstrap })
+  const swarm = new HyperDHT({ bootstrap })
   const router = new ProtomuxRPCRouter()
-  const service = new BlindPushGateway(swarm, router, {
+  // push service stub to simulate real fcm send
+  const pushServiceStub = {
     send: async (message) => {
       sentMessages.push(message)
     }
-  })
+  }
+  const service = new BlindPushGateway(swarm, router, pushServiceStub)
 
   t.teardown(
     async () => {

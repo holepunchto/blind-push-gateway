@@ -4,7 +4,7 @@ const fs = require('fs/promises')
 const os = require('os')
 const path = require('path')
 const Corestore = require('corestore')
-const Hyperswarm = require('hyperswarm')
+const HyperDHT = require('hyperdht')
 const ProtomuxRPCRouter = require('protomux-rpc-router')
 const IdEnc = require('hypercore-id-encoding')
 const goodbye = require('graceful-goodbye')
@@ -42,7 +42,7 @@ const runCmd = command(
     logger.info(`Using storage: ${storage}`)
 
     const store = new Corestore(storage)
-    const swarm = new Hyperswarm({
+    const swarm = new HyperDHT({
       keyPair: await store.createKeyPair('swarm-key')
     })
     const router = new ProtomuxRPCRouter()
