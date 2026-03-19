@@ -15,10 +15,12 @@
   "type": "commonjs",
   "main": "index.js",
   "bin": {
-    "blind-push-gateway": "bin.js"
+    "blind-push-gateway": "bin.js",
+    "blind-push-gateway-bare": "bin-bare.js"
   },
   "files": [
     "bin.js",
+    "bin-bare.js",
     "index.js",
     "lib/",
     "spec/"
@@ -27,7 +29,8 @@
     "build": "node build.js",
     "lint": "lunte && prettier --check .",
     "format": "prettier --write .",
-    "test": "npm run lint && brittle test/test.js"
+    "test": "npm run lint && brittle test/test.js",
+    "test:bare": "brittle-bare test/test.js"
   },
   "dependencies": {
     "b4a": "^1.8.0",
