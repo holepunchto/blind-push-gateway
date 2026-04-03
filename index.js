@@ -2,9 +2,8 @@ const ReadyResource = require('ready-resource')
 const b4a = require('b4a')
 const cenc = require('compact-encoding')
 
-const schema = require('./spec/hyperschema')
-
-const ForwardPushRequest = schema.getEncoding('@blind-push-gateway/forward-push-request')
+const blindPush = require('@holepunchto/blind-push')
+const { ForwardPushRequest } = require('@holepunchto/blind-push/encodings')
 
 const DEFAULT_NOTIFICATION = {
   title: 'Keet',
@@ -108,9 +107,14 @@ class BlindPushGateway extends ReadyResource {
     this.stats.attempted++
 
     try {
-      const payload = b4a.toString(cenc.encode(ForwardPushRequest, req), 'base64')
-      const topic = b4a.toString(req.discoveryKey, 'hex')
-      const threadId = b4a.toString(req.discoveryKey, 'base64')
+      const pushPayload = {
+        version: 0,
+        extra: null,
+        ...req.payload
+      }
+      const payload = b4a.toString(blindPush.encode(pushPayload), 'base64')
+      const topic = b4a.toString(pushPayload.discoveryKey, 'hex')
+      const threadId = b4a.toString(pushPayload.discoveryKey, 'base64')
 
       /** @type {ExternalPushMessage} */
       const message = {
