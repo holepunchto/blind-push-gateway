@@ -107,14 +107,9 @@ class BlindPushGateway extends ReadyResource {
     this.stats.attempted++
 
     try {
-      const pushPayload = {
-        version: 0,
-        extra: null,
-        ...req.payload
-      }
-      const payload = b4a.toString(blindPush.encode(pushPayload), 'base64')
-      const topic = b4a.toString(pushPayload.discoveryKey, 'hex')
-      const threadId = b4a.toString(pushPayload.discoveryKey, 'base64')
+      const payload = b4a.toString(blindPush.encode(req.payload), 'base64')
+      const topic = b4a.toString(req.payload.discoveryKey, 'hex')
+      const threadId = b4a.toString(req.payload.discoveryKey, 'base64')
 
       /** @type {ExternalPushMessage} */
       const message = {
