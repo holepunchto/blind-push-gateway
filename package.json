@@ -31,8 +31,8 @@
     "test:bare": "brittle-bare test/test.js"
   },
   "dependencies": {
-    "@holepunchto/blind-push": "file:../blind-push",
     "b4a": "^1.8.0",
+    "blind-push": "^0.2.3",
     "compact-encoding": "^2.18.0",
     "corestore": "^7.9.1",
     "firebase-admin": "^13.7.0",

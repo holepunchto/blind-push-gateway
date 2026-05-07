@@ -6,8 +6,8 @@ const ProtomuxRPCRouter = require('protomux-rpc-router')
 const b4a = require('b4a')
 const cenc = require('compact-encoding')
 
-const blindPush = require('@holepunchto/blind-push')
-const { ForwardPushRequest } = require('@holepunchto/blind-push/encodings')
+const blindPush = require('blind-push')
+const { ForwardPushRequest } = require('blind-push/encodings')
 
 const BlindPushGateway = require('..')
 
@@ -23,7 +23,7 @@ async function setupGateway(t, bootstrap) {
   const router = new ProtomuxRPCRouter()
   // push service stub to simulate real fcm send
   const pushServiceStub = {
-    send: async (message) => {
+    send: (message) => {
       sentMessages.push(message)
     }
   }

@@ -2,8 +2,8 @@ const ReadyResource = require('ready-resource')
 const b4a = require('b4a')
 const cenc = require('compact-encoding')
 
-const blindPush = require('@holepunchto/blind-push')
-const { ForwardPushRequest } = require('@holepunchto/blind-push/encodings')
+const blindPush = require('blind-push')
+const { ForwardPushRequest } = require('blind-push/encodings')
 
 const DEFAULT_NOTIFICATION = {
   title: 'Keet',
