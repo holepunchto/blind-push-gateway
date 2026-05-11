@@ -6,8 +6,8 @@ const ProtomuxRPCRouter = require('protomux-rpc-router')
 const b4a = require('b4a')
 const cenc = require('compact-encoding')
 
-const schema = require('../spec/hyperschema')
-const ForwardPushRequest = schema.getEncoding('@blind-push-gateway/forward-push-request')
+const blindPush = require('blind-push')
+const { ForwardPushRequest } = require('blind-push/encodings')
 
 const BlindPushGateway = require('..')
 
@@ -23,7 +23,7 @@ async function setupGateway(t, bootstrap) {
   const router = new ProtomuxRPCRouter()
   // push service stub to simulate real fcm send
   const pushServiceStub = {
-    send: async (message) => {
+    send: (message) => {
       sentMessages.push(message)
     }
   }
@@ -65,8 +65,12 @@ test('forward-push sends the expected payload', async (t) => {
   const rpc = await setupClient(t, bootstrap, service.publicKey)
 
   const req = {
-    payload: b4a.from('blind-push'),
-    discoveryKey: b4a.alloc(32, 0x42)
+    payload: {
+      payload: b4a.from('blind-push'),
+      discoveryKey: b4a.alloc(32, 0x42),
+      version: 0,
+      extra: null
+    }
   }
 
   await rpc.request('forward-push', req, {
@@ -76,15 +80,15 @@ test('forward-push sends the expected payload', async (t) => {
 
   t.is(sentMessages.length, 1, 'one message was sent')
 
-  const encodedPayload = b4a.toString(cenc.encode(ForwardPushRequest, req), 'base64')
+  const encodedPayload = b4a.toString(blindPush.encode(req.payload), 'base64')
   const message = sentMessages[0]
-  t.is(message.topic, b4a.toString(req.discoveryKey, 'hex'))
+  t.is(message.topic, b4a.toString(req.payload.discoveryKey, 'hex'))
   t.is(message.android.priority, 'high')
   t.is(message.android.data.title, 'Keet')
   t.is(message.android.data.body, '✉️')
   t.is(message.android.data.payload, encodedPayload)
   t.is(message.apns.headers['apns-topic'], 'io.keet.app')
-  t.is(message.apns.payload.aps.threadId, b4a.toString(req.discoveryKey, 'base64'))
+  t.is(message.apns.payload.aps.threadId, b4a.toString(req.payload.discoveryKey, 'base64'))
   t.is(message.apns.payload.payload, encodedPayload)
   t.alike(service.stats, { attempted: 1, sent: 1, failed: 0 }, 'stats updated')
 })

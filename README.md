@@ -37,7 +37,7 @@ The service will log its public key on startup. Clients can connect to that swar
 
 1. The operator starts the gateway with Firebase service account credentials.
 2. The gateway listens on Hyperswarm and accepts RPC connections through `protomux-rpc-router`.
-3. A client sends a `forward-push` request containing a payload and discovery key.
+3. A client sends a `forward-push` request encoded with `blind-push/encodings`.
 4. The gateway encodes the request, derives Android/APNS fields, and forwards the message through the configured push service.
 
 ## CLI
