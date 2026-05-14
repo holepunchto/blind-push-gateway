@@ -72,13 +72,3 @@ Gracefully shut down the gateway.
 #### `service.publicKey`
 
 The swarm public key clients use to connect.
-
-## TODOs (before V1)
-
-- Add more tests beyond the current happy-path coverage
-- Figure out a plan for integration testing with FCM
-- Discuss and refine the config format
-  - currently the gateway support only 1 `appId`, and 1 set of config, the requirements may change
-- stats and instrument integration
-- add bare support with `bin-bare.js`
-- add `blind-push-gateway-service` package for deployment
