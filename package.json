@@ -26,7 +26,7 @@
   ],
   "scripts": {
     "lint": "lunte && prettier --check .",
-    "format": "prettier --write .",
+    "format": "prettier --write . && lunte --fix",
     "test": "npm run lint && brittle-node test/test.js",
     "test:bare": "brittle-bare test/test.js"
   },
