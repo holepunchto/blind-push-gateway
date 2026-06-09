@@ -49,8 +49,7 @@ const runCmd = command(
     const pushService = new FcmPushService(certPath)
 
     const service = new BlindPushGateway(swarm, router, pushService, {
-      notification: config.notification,
-      apnsTopic: config.apnsTopic
+      notification: config.notification
     })
 
     goodbye(async () => {

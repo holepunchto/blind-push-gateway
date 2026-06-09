@@ -87,7 +87,6 @@ test('forward-push sends the expected payload', async (t) => {
   t.is(message.android.data.title, 'Keet')
   t.is(message.android.data.body, '✉️')
   t.is(message.android.data.payload, encodedPayload)
-  t.is(message.apns.headers['apns-topic'], 'io.keet.app')
   t.is(message.apns.payload.aps.threadId, b4a.toString(req.payload.discoveryKey, 'base64'))
   t.is(message.apns.payload.payload, encodedPayload)
   t.alike(service.stats, { attempted: 1, sent: 1, failed: 0 }, 'stats updated')

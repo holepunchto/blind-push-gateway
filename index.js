@@ -10,8 +10,6 @@ const DEFAULT_NOTIFICATION = {
   body: '✉️'
 }
 
-const DEFAULT_APNS_TOPIC = 'io.keet.app'
-
 /**
  * @typedef {object} ExternalPushMessage
  * @property {string} topic
@@ -25,7 +23,6 @@ const DEFAULT_APNS_TOPIC = 'io.keet.app'
  * }} android
  * @property {{
  *   headers: {
- *     'apns-topic': string,
  *     'apns-push-type': string
  *   },
  *   payload: {
@@ -56,21 +53,14 @@ class BlindPushGateway extends ReadyResource {
    * @param {ExternalPushService} externalPushService
    * @param {object} [opts]
    * @param {{ title?: string, body?: string }} [opts.notification]
-   * @param {string} [opts.apnsTopic='io.keet.app']
    */
-  constructor(
-    dht,
-    router,
-    externalPushService,
-    { notification = DEFAULT_NOTIFICATION, apnsTopic = DEFAULT_APNS_TOPIC } = {}
-  ) {
+  constructor(dht, router, externalPushService, { notification = DEFAULT_NOTIFICATION } = {}) {
     super()
 
     this.dht = dht
     this.router = router
     this.externalPushService = externalPushService
     this.notification = notification
-    this.apnsTopic = apnsTopic
     this.stats = { attempted: 0, sent: 0, failed: 0 }
 
     this.router.method(
@@ -123,7 +113,6 @@ class BlindPushGateway extends ReadyResource {
         },
         apns: {
           headers: {
-            'apns-topic': this.apnsTopic,
             'apns-push-type': 'alert'
           },
           payload: {

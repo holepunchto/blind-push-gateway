@@ -20,8 +20,7 @@ Create a config file at `~/.blind-push-gateway/config.json`:
   "notification": {
     "title": "Keet",
     "body": "✉️"
-  },
-  "apnsTopic": "io.keet.app"
+  }
 }
 ```
 
