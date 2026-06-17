@@ -118,7 +118,7 @@ class BlindPushGateway extends ReadyResource {
           priority: 'high',
           data: {
             ...this.notification,
-            payload
+            message: payload
           }
         },
         apns: {
@@ -134,7 +134,7 @@ class BlindPushGateway extends ReadyResource {
               sound: 'default',
               threadId
             },
-            payload
+            message: payload
           }
         }
       }
