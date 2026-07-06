@@ -147,6 +147,34 @@ class BlindPushGateway extends ReadyResource {
       throw err
     }
   }
+
+  registerMetrics(promClient) {
+    const self = this
+
+    new promClient.Gauge({
+      name: 'blind_push_gateway_attempted',
+      help: 'The total amount of notify requests received',
+      collect() {
+        this.set(self.stats.attempted)
+      }
+    })
+
+    new promClient.Gauge({
+      name: 'blind_push_gateway_sent',
+      help: 'The total amount of notify requests sent',
+      collect() {
+        this.set(self.stats.sent)
+      }
+    })
+
+    new promClient.Gauge({
+      name: 'blind_push_gateway_failed',
+      help: 'The total amount of notify requests that failed',
+      collect() {
+        this.set(self.stats.failed)
+      }
+    })
+  }
 }
 
 module.exports = BlindPushGateway

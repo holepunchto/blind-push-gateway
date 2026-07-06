@@ -10,6 +10,8 @@ const IdEnc = require('hypercore-id-encoding')
 const goodbye = require('graceful-goodbye')
 const { command, flag } = require('paparam')
 const pino = require('pino')
+const Instrumentation = require('hyper-instrument')
+const { version: ownVersion } = require('./package.json')
 
 const BlindPushGateway = require('.')
 const FcmPushService = require('./lib/fcm')
@@ -22,7 +24,15 @@ const runCmd = command(
   'run',
   flag('--config|-c [path]', `config path, defaults to ${DEFAULT_CONFIG_PATH}`),
   flag('--storage|-s [path]', `storage path, defaults to ${DEFAULT_STORAGE_PATH}`),
-
+  flag(
+    '--scraper-public-key [scraper-public-key]',
+    'Public key of a dht-prometheus scraper.  Can be hex or z32.'
+  ),
+  flag(
+    '--scraper-secret [scraper-secret]',
+    'Secret of the dht-prometheus scraper.  Can be hex or z32.'
+  ),
+  flag('--scraper-alias [scraper-alias]', '(optional) Alias with which to register to the scraper'),
   async function ({ flags }) {
     const logger = pino({ name: SERVICE_NAME })
 
@@ -60,6 +70,42 @@ const runCmd = command(
       await swarm.destroy()
       await store.close()
     })
+
+    if (flags.scraperPublicKey) {
+      logger.info('Setting up instrumentation')
+
+      const scraperPublicKey = IdEnc.decode(flags.scraperPublicKey)
+      const scraperSecret = IdEnc.decode(flags.scraperSecret)
+
+      let prometheusAlias = flags.scraperAlias
+      if (prometheusAlias && prometheusAlias.length > 99) {
+        throw new Error('The Prometheus alias must have length less than 100')
+      }
+      if (!prometheusAlias) {
+        prometheusAlias = `blind-push-gateway-${IdEnc.normalize(swarm.keyPair.publicKey)}`.slice(
+          0,
+          99
+        )
+      }
+
+      const instrumentation = new Instrumentation({
+        swarm,
+        corestore: store,
+        scraperPublicKey,
+        prometheusAlias,
+        scraperSecret,
+        prometheusServiceName: SERVICE_NAME,
+        version: ownVersion
+      })
+
+      service.registerMetrics(instrumentation.promClient)
+      instrumentation.registerLogger(logger)
+      await instrumentation.ready()
+
+      goodbye(async () => {
+        await instrumentation.close()
+      })
+    }
 
     logger.info('Starting blind-push-gateway service')
     await pushService.ready()
