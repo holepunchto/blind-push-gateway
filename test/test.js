@@ -20,7 +20,7 @@ async function setupTestnet(t) {
 
 async function setupGateway(t, bootstrap) {
   const sentMessages = []
-  const swarm = new HyperDHT({ bootstrap })
+  const dht = new HyperDHT({ bootstrap })
   const router = new ProtomuxRPCRouter()
   // push service stub to simulate real fcm send
   const pushServiceStub = {
@@ -28,14 +28,14 @@ async function setupGateway(t, bootstrap) {
       sentMessages.push(message)
     }
   }
-  const service = new BlindPushGateway(swarm, router, pushServiceStub)
+  const service = new BlindPushGateway(dht, router, pushServiceStub)
   service.registerMetrics(promClient)
 
   t.teardown(
     async () => {
       promClient.register.clear()
       await service.close()
-      await swarm.destroy()
+      await dht.destroy()
     },
     { order: 3000 }
   )

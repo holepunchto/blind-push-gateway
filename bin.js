@@ -52,13 +52,13 @@ const runCmd = command(
     logger.info(`Using storage: ${storage}`)
 
     const store = new Corestore(storage)
-    const swarm = new HyperDHT({
+    const dht = new HyperDHT({
       keyPair: await store.createKeyPair('swarm-key')
     })
     const router = new ProtomuxRPCRouter()
     const pushService = new FcmPushService(certPath)
 
-    const service = new BlindPushGateway(swarm, router, pushService, {
+    const service = new BlindPushGateway(dht, router, pushService, {
       notification: config.notification,
       apnsTopic: config.apnsTopic
     })
@@ -67,7 +67,7 @@ const runCmd = command(
       logger.info('Shutting down blind-push-gateway service')
       await service.close()
       await pushService.close()
-      await swarm.destroy()
+      await dht.destroy()
       await store.close()
     })
 
@@ -82,15 +82,12 @@ const runCmd = command(
         throw new Error('The Prometheus alias must have length less than 100')
       }
       if (!prometheusAlias) {
-        prometheusAlias = `blind-push-gateway-${IdEnc.normalize(swarm.keyPair.publicKey)}`.slice(
-          0,
-          99
-        )
+        prometheusAlias =
+          `blind-push-gateway-${IdEnc.normalize(dht.defaultKeyPair.publicKey)}`.slice(0, 99)
       }
 
       const instrumentation = new Instrumentation({
-        swarm,
-        corestore: store,
+        dht,
         scraperPublicKey,
         prometheusAlias,
         scraperSecret,
