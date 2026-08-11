@@ -16,6 +16,7 @@ jobs:
       TEST_KEY: "123"
     steps:
       - uses: twingate/github-action@f1e69fc5af67b737d8597b759e5c607f567e77f2 # v1.8
+        if: runner.os != 'macOS'
         with:
           service-key: ${{ env.TEST_KEY }}
       - uses: holepunchto/actions/bare-base@v1
