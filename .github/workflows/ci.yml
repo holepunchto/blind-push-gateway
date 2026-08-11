@@ -13,7 +13,13 @@ jobs:
     runs-on: ${{ matrix.os }}
     name: Test / ${{ matrix.os }}
     steps:
-      - uses: holepunchto/actions/node-base@v1
-      - run: npm test
+      # - uses: holepunchto/actions/node-base@v1
+      # - run: npm test
       - uses: holepunchto/actions/bare-base@v1
-      - run: npm run test:bare
+      - shell: bash
+        run: |
+          for i in $(seq 1 100); do
+            echo "::group::run $i"
+            npm run test:bare
+            echo "::endgroup::"
+          done
