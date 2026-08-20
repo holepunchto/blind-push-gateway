@@ -71,7 +71,7 @@ class BlindPushGateway extends ReadyResource {
     this.externalPushService = externalPushService
     this.notification = notification
     this.apnsTopic = apnsTopic
-    this.stats = { attempted: 0, sent: 0, failed: 0 }
+    this.stats = { attempted: 0, sent: 0, failed: 0, errorCodes: {} }
 
     this.router.method(
       'forward-push',
@@ -143,7 +143,9 @@ class BlindPushGateway extends ReadyResource {
 
       this.stats.sent++
     } catch (err) {
+      const code = err.code || 'UNKNOWN'
       this.stats.failed++
+      this.stats.errorCodes[code] = (this.stats.errorCodes[code] || 0) + 1
       throw err
     }
   }
@@ -172,6 +174,17 @@ class BlindPushGateway extends ReadyResource {
       help: 'The total amount of notify requests that failed',
       collect() {
         this.set(self.stats.failed)
+      }
+    })
+
+    new promClient.Gauge({
+      name: 'blind_push_gateway_error_codes',
+      help: 'The total amount of notify requests that failed, by error code',
+      labelNames: ['code'],
+      collect() {
+        for (const [code, count] of Object.entries(self.stats.errorCodes)) {
+          this.set({ code }, count)
+        }
       }
     })
   }

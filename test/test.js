@@ -93,7 +93,7 @@ test('forward-push sends the expected payload', async (t) => {
   t.is(message.apns.headers['apns-topic'], 'io.keet.app')
   t.is(message.apns.payload.aps.threadId, b4a.toString(req.payload.discoveryKey, 'base64'))
   t.is(message.apns.payload.payload, encodedPayload)
-  t.alike(service.stats, { attempted: 1, sent: 1, failed: 0 }, 'stats updated')
+  t.alike(service.stats, { attempted: 1, sent: 1, failed: 0, errorCodes: {} }, 'stats updated')
 
   const metrics = await promClient.register.metrics()
   t.ok(metrics.includes('blind_push_gateway_attempted 1'), 'blind_push_gateway_attempted included')
